@@ -1,7 +1,11 @@
 import httpx
+from typing import Any, Dict, List
 from .base_fetcher import BasePriceFetcher
 
 class CoinCapFetcher(BasePriceFetcher):
+    source_name = "coincap"
+    healthcheck_url = "https://api.coincap.io/v2/rates"
+
     async def fetch_prices(self) -> List[Dict[str, Any]]:
         async with httpx.AsyncClient() as client:
             resp = await client.get("https://api.coincap.io/v2/assets")

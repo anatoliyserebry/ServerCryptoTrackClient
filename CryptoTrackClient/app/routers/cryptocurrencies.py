@@ -3,10 +3,14 @@ from sqlalchemy.orm import Session
 from typing import List
 from .. import schemas, models, crud
 from ..database import get_db
-from ..services.price_fetcher import fetch_all_prices
+from ..services.price_fetcher import fetch_all_prices, get_fetchers_availability
 from ..services.fiat_service import get_fiat_rate
 
 router = APIRouter(prefix="/crypto", tags=["cryptocurrencies"])
+
+@router.get("/apis/status", response_model=List[schemas.ApiAvailability])
+async def get_apis_status():
+    return await get_fetchers_availability()
 
 @router.get("/", response_model=List[schemas.Crypto])
 async def get_cryptocurrencies(

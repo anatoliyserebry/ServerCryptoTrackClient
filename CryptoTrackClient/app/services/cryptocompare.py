@@ -1,8 +1,12 @@
 import httpx
+from typing import Any, Dict, List
 from .base_fetcher import BasePriceFetcher
 from ..config import settings
 
 class CryptoCompareFetcher(BasePriceFetcher):
+    source_name = "cryptocompare"
+    healthcheck_url = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC&tsyms=USD"
+
     async def fetch_prices(self) -> List[Dict[str, Any]]:
         headers = {}
         if settings.CRYPTOCOMPARE_API_KEY:

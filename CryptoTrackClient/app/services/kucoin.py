@@ -1,7 +1,11 @@
 import httpx
+from typing import Any, Dict, List
 from .base_fetcher import BasePriceFetcher
 
 class KuCoinFetcher(BasePriceFetcher):
+    source_name = "kucoin"
+    healthcheck_url = "https://api.kucoin.com/api/v1/status"
+
     async def fetch_prices(self) -> List[Dict[str, Any]]:
         async with httpx.AsyncClient() as client:
             resp = await client.get("https://api.kucoin.com/api/v1/market/allTickers")
@@ -20,4 +24,3 @@ class KuCoinFetcher(BasePriceFetcher):
                         "volume_24h": float(ticker["vol"])
                     })
             return result
-

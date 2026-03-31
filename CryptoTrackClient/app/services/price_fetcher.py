@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Any, Dict, List
 from sqlalchemy.orm import Session
 from datetime import datetime
 from .. import models, crud
@@ -13,8 +14,8 @@ from .kucoin import KuCoinFetcher
 
 logger = logging.getLogger(__name__)
 
-async def fetch_all_prices(db: Session):
-    fetchers = [
+def get_price_fetchers():
+    return [
         BinanceFetcher(),
         CoinGeckoFetcher(),
         CoinCapFetcher(),
@@ -24,7 +25,41 @@ async def fetch_all_prices(db: Session):
         KuCoinFetcher()
     ]
 
-    results = await asyncio.gather(*[f.fetch_prices() for f in fetchers], return_exceptions=True)
+async def get_fetchers_availability() -> List[Dict[str, Any]]:
+    fetchers = get_price_fetchers()
+    checks = await asyncio.gather(*[f.is_available() for f in fetchers], return_exceptions=True)
+
+    statuses = []
+    for fetcher, check in zip(fetchers, checks):
+        if isinstance(check, Exception):
+            statuses.append(
+                {"api": fetcher.source_name, "accessible": False, "error": str(check)}
+            )
+        else:
+            statuses.append({"api": fetcher.source_name, "accessible": check, "error": None})
+    return statuses
+
+async def fetch_all_prices(db: Session):
+    fetchers = get_price_fetchers()
+    checks = await asyncio.gather(*[f.is_available() for f in fetchers], return_exceptions=True)
+
+    available_fetchers = []
+    for fetcher, check in zip(fetchers, checks):
+        if isinstance(check, Exception):
+            logger.warning("Availability check failed for %s: %s", fetcher.source_name, check)
+            continue
+        if check:
+            available_fetchers.append(fetcher)
+        else:
+            logger.warning("API %s is inaccessible, skipped", fetcher.source_name)
+
+    if not available_fetchers:
+        logger.warning("No API source is available. Price update skipped.")
+        return
+
+    results = await asyncio.gather(
+        *[f.fetch_prices() for f in available_fetchers], return_exceptions=True
+    )
 
     all_prices = []
     for res in results:

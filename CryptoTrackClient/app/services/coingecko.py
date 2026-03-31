@@ -1,8 +1,12 @@
 import httpx
+from typing import Any, Dict, List
 from .base_fetcher import BasePriceFetcher
 from ..config import settings
 
 class CoinGeckoFetcher(BasePriceFetcher):
+    source_name = "coingecko"
+    healthcheck_url = "https://api.coingecko.com/api/v3/ping"
+
     async def fetch_prices(self) -> List[Dict[str, Any]]:
         async with httpx.AsyncClient() as client:
             params = {

@@ -1,7 +1,11 @@
 import httpx
+from typing import Any, Dict, List
 from .base_fetcher import BasePriceFetcher
 
 class BinanceFetcher(BasePriceFetcher):
+    source_name = "binance"
+    healthcheck_url = "https://api.binance.com/api/v3/ping"
+
     async def fetch_prices(self) -> List[Dict[str, Any]]:
         async with httpx.AsyncClient() as client:
             resp = await client.get("https://api.binance.com/api/v3/ticker/24hr")

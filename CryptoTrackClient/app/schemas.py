@@ -84,3 +84,8 @@ class ConversionResponse(BaseModel):
     amount: float
     converted_amount: float
     rate: float
+
+class ApiAvailability(BaseModel):
+    api: str
+    accessible: bool
+    error: Optional[str] = None
