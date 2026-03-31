@@ -3,14 +3,21 @@ import logging
 from typing import Any, Dict, List
 from sqlalchemy.orm import Session
 from datetime import datetime
-from .. import models, crud
-from .binance import BinanceFetcher
-from .coingecko import CoinGeckoFetcher
-from .coincap import CoinCapFetcher
-from .coinmarketcap import CoinMarketCapFetcher
-from .coinstats import CoinStatsFetcher
-from .cryptocompare import CryptoCompareFetcher
-from .kucoin import KuCoinFetcher
+
+if __package__ in (None, ""):
+    import os
+    import sys
+
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
+from app import crud, models
+from app.services.binance import BinanceFetcher
+from app.services.coingecko import CoinGeckoFetcher
+from app.services.coincap import CoinCapFetcher
+from app.services.coinmarketcap import CoinMarketCapFetcher
+from app.services.coinstats import CoinStatsFetcher
+from app.services.cryptocompare import CryptoCompareFetcher
+from app.services.kucoin import KuCoinFetcher
 
 logger = logging.getLogger(__name__)
 
