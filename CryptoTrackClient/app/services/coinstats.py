@@ -1,7 +1,11 @@
 import httpx
+from typing import Any, Dict, List
 from .base_fetcher import BasePriceFetcher
 
 class CoinStatsFetcher(BasePriceFetcher):
+    source_name = "coinstats"
+    healthcheck_url = "https://api.coinstats.app/public/v1/global"
+
     async def fetch_prices(self) -> List[Dict[str, Any]]:
         async with httpx.AsyncClient() as client:
             resp = await client.get("https://api.coinstats.app/public/v1/coins?skip=0&limit=100&currency=USD")

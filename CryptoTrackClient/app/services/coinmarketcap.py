@@ -1,8 +1,12 @@
 import httpx
+from typing import Any, Dict, List
 from .base_fetcher import BasePriceFetcher
 from ..config import settings
 
 class CoinMarketCapFetcher(BasePriceFetcher):
+    source_name = "coinmarketcap"
+    healthcheck_url = "https://pro-api.coinmarketcap.com/v1/key/info"
+
     async def fetch_prices(self) -> List[Dict[str, Any]]:
         headers = {"X-CMC_PRO_API_KEY": settings.COINMARKETCAP_API_KEY}
         params = {"start": "1", "limit": 100, "convert": "USD"}
